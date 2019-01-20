@@ -1,0 +1,22 @@
+# Python
+/env/
+/build/
+*.py[co]
+*.egg*
+.cache
+python/env
+.envrc
+*.ipynb
+*~
+.\#*
+\#*\#
+*.swp
+.idea/
+*.iml
+.parquet/
+.idea/*
+.idea/compiler.xml
+.idea/workspace.xml
+*.html
+
+
