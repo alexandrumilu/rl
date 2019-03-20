@@ -128,7 +128,7 @@ class DQN(object):
                     )
                 )
                 self.value.append(
-                    self.sess.run(self.value_function, feed_dict={self.states_placeholder: state.reshape(4, 1)})[0])
+                    self.sess.run(self.value_function, feed_dict={self.states_placeholder: state.reshape(state.shape[0], 1)})[0])
                 next_state, reward, done, info = self.env.step(action)
                 self.replay_buffer.update_data(state, action, next_state, reward, done)
                 state = next_state
