@@ -195,10 +195,11 @@ class TD3(DDPG):
                 action = self.explore(state, standard_div)
                 self.actions.append(action) #logging
                 actions_taken+=1
+                action = action.flatten() #some environments complain if not it is aX1
                 next_state, reward, done, info = self.env.step(action)
             
                 next_state = next_state.reshape(next_state.shape[0],)#for some reason next_state some times is (m,1) and not (m,)
-                action = action.reshape(action.shape[0],)
+                
                 self.replay_buffer.update_data(state, action, next_state, reward, done)
                 state = next_state
 

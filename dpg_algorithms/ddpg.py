@@ -166,6 +166,7 @@ class DDPG(object):
                 
                 action = self.explore(state, standard_div)
                 self.actions.append(action)
+                action = action.flatten() #some env do not work if action not flat
                 next_state, reward, done, info = self.env.step(action)
             
                 next_state = next_state.reshape(next_state.shape[0],)#for some reason next_state some times is (m,1) and not (m,)
