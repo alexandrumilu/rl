@@ -38,14 +38,16 @@ class PolicyGradientValue(PolicyGradientRewardToGo):
     def train_one_epoch(self):
         states, actions, rewards, state_is_terminal = self.collect_experience()
         weights = self.calculate_weights(rewards, state_is_terminal)
-
+        
+        _ = self.sess.run(self.update_value, feed_dict={
+            self.state_placeholder: states,
+            self.target_placeholder: weights
+        })
+        
         _ = self.sess.run(self.update, feed_dict={
             self.state_placeholder: states,
             self.actions_placeholder: actions,
             self.weights_placeholder: weights
         })
 
-        _ = self.sess.run(self.update_value, feed_dict={
-            self.state_placeholder: states,
-            self.target_placeholder: weights
-        })
+        
