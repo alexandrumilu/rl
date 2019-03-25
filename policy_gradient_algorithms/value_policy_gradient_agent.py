@@ -11,6 +11,7 @@ class PolicyGradientValue(PolicyGradientRewardToGo):
             env,
             value_optimizer,
             value_generator,
+            number_of_gradient_steps_value
     ):
         super(PolicyGradientValue, self).__init__(
             num_episodes,
@@ -21,7 +22,7 @@ class PolicyGradientValue(PolicyGradientRewardToGo):
         )
         self.value_optimizer = value_optimizer
         self.value_generator = value_generator
-
+        self.number_of_gradient_steps_value = number_of_gradient_steps_value
         # initialize what we need for value function update
         self.value_function = value_generator.get_output_layer(self.state_placeholder)
         self.target_placeholder = target_placeholder = tf.placeholder(tf.float32)
@@ -38,11 +39,11 @@ class PolicyGradientValue(PolicyGradientRewardToGo):
     def train_one_epoch(self):
         states, actions, rewards, state_is_terminal = self.collect_experience()
         weights = self.calculate_weights(rewards, state_is_terminal)
-        
-        _ = self.sess.run(self.update_value, feed_dict={
-            self.state_placeholder: states,
-            self.target_placeholder: weights
-        })
+        for _ in range(self.number_of_gradient_steps_value):
+            _ = self.sess.run(self.update_value, feed_dict={
+                self.state_placeholder: states,
+                self.target_placeholder: weights
+            })
         
         _ = self.sess.run(self.update, feed_dict={
             self.state_placeholder: states,

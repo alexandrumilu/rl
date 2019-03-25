@@ -12,6 +12,7 @@ class PolicyGradientBootStrap(PolicyGradientValue):
             env,
             value_optimizer,
             value_generator,
+            number_of_gradient_steps_value
     ):
         super(PolicyGradientBootStrap, self).__init__(
             num_episodes,
@@ -21,11 +22,17 @@ class PolicyGradientBootStrap(PolicyGradientValue):
             env,
             value_optimizer,
             value_generator,
+            number_of_gradient_steps_value
         )
 
     def train_one_epoch(self):
         states, actions, rewards, state_is_terminal = self.collect_experience()
         targets = self.calculate_targets(rewards, state_is_terminal, states)
+        for _ in range(self.number_of_gradient_steps_value):
+            _ = self.sess.run(self.update_value, feed_dict={
+                self.state_placeholder: states,
+                self.target_placeholder: targets
+            })
 
         _ = self.sess.run(self.update, feed_dict={
             self.state_placeholder: states,
@@ -33,10 +40,7 @@ class PolicyGradientBootStrap(PolicyGradientValue):
             self.weights_placeholder: targets
         })
 
-        _ = self.sess.run(self.update_value, feed_dict={
-            self.state_placeholder: states,
-            self.target_placeholder: targets
-        })
+
 
     def calculate_targets(self, rewards, state_is_terminal_flag, states):
         # write it vectorized

@@ -12,6 +12,7 @@ class PolicyGradientGAE(PolicyGradientValue):
             env,
             value_optimizer,
             value_generator,
+            number_of_gradient_steps_value,
             gamma,
             lamda
     ):
@@ -22,7 +23,8 @@ class PolicyGradientGAE(PolicyGradientValue):
             policy_generator,
             env,
             value_optimizer,
-            value_generator
+            value_generator,
+            number_of_gradient_steps_value
         )
 
         self.loss = tf.reduce_mean(self.log_probability * self.weights_placeholder)
@@ -36,12 +38,13 @@ class PolicyGradientGAE(PolicyGradientValue):
         states, actions, rewards, state_is_terminal = self.collect_experience()
 
         weights = self.calculate_discounted_reward_to_go(rewards, state_is_terminal, self.gamma)
+        for _ in range(self.number_of_gradient_steps_value):
+            _, loss_v = self.sess.run([self.update_value, self.value_loss], feed_dict={
+                self.state_placeholder: states,
+                self.target_placeholder: weights
+            })
+            self.losses.append(loss_v)
 
-        _, loss_v = self.sess.run([self.update_value, self.value_loss], feed_dict={
-            self.state_placeholder: states,
-            self.target_placeholder: weights
-        })
-        self.losses.append(loss_v)
         targets = self.calculate_gae(rewards, state_is_terminal, states)
         _ = self.sess.run(self.update, feed_dict={
             self.state_placeholder: states,
