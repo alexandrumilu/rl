@@ -103,7 +103,12 @@ class DQN(object):
         for q_val, target in zip(sorted_q_vals, sorted_targets):
             assign_ops.append(target.assign(q_val))
         return assign_ops
-
+    def choose_best_action(self,state):
+        best_action = self.sess.run(self.best_actions, feed_dict = {self.states_placeholder: state.reshape(state.shape[0],1)})
+        return best_action
+    def return_q_values(self,state):
+        q_values = self.sess.run(self.q_values, feed_dict = {self.states_placeholder: state.reshape(state.shape[0],1)})
+        return q_values
     def train(self, start_from_scratch=True, num_episodes = None):
         num_episodes = num_episodes or self.num_episodes
         #start_from_scratch is a bool specifying if variables, replay buffer should be initialized.
